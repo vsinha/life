@@ -43,6 +43,8 @@ function drawRect(x, y, width, height, color) {
 function displayBoard(board) {
   for (var i = 0; i < board.length; i += 1) {
     for (var j = 0; j < board[i].length; j += 1) {
+      // draw with "squareSize - 1" to leave convenient gaps between the cells,
+      // making it look like a game board
       if (board[i][j] == 1) {
         drawRect(j*squareSize, i*squareSize, squareSize-1, squareSize-1, "#33AA55");
       } else {
@@ -149,7 +151,7 @@ function coordinates2RowAndCol(x, y) {
 }
 
 
-function toggleCellStateAtCoordinate(x, y) {
+function toggleCellStateAtCoordinateAndUpdateBoard(x, y) {
   var result = coordinates2RowAndCol(x, y);
   var i = result.i;
   var j = result.j;
@@ -195,7 +197,7 @@ function addHandlers() {
     // Handle single click events
   canvas.addEventListener('click', function(ev) {
     var mousePos = getMousePositionfromEvent(ev);
-    toggleCellStateAtCoordinate(mousePos.x, mousePos.y);
+    toggleCellStateAtCoordinateAndUpdateBoard(mousePos.x, mousePos.y);
   });
 
   // Handle click & drag events
@@ -204,6 +206,8 @@ function addHandlers() {
     var cellState = getCellStateAtCoordinate(mouseDownPos.x, mouseDownPos.y);
 
     // Create the handler in here so we have access to cellState
+    // we want to be able to paint 0s if we've started by 0ing a cell,
+    // and paint 1s if we started by 1ing a cell.
     function mouseMoveHandler(ev) {
       var mousePos = getMousePositionfromEvent(ev);
 
@@ -218,7 +222,7 @@ function addHandlers() {
     // Add the handler we just created
     canvas.addEventListener("mousemove", mouseMoveHandler);
 
-    // Finally, add the mouseup handler so we remove the mousemove handler
+    // Finally, we add the mouseup handler and remove the mousemove handler
     canvas.addEventListener("mouseup", function(ev) {
       console.log("adding this listener again");
       canvas.removeEventListener("mousemove", mouseMoveHandler);
